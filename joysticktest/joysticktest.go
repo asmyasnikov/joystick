@@ -6,8 +6,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/asmyasnikov/joystick"
 	"github.com/nsf/termbox-go"
-	"github.com/0xcafed00d/joystick"
 	"os"
 	"strconv"
 	"time"

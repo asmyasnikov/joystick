@@ -26,6 +26,16 @@ var (
 	}
 )
 
+// Interface JoystickChannelled provides access to the Joystick opened with the Open() function and make events channel to out
+type JoystickChannelled interface {
+	Joystick
+	// Events receives the events read from the joystick input.
+	// If an Event is not consumed before the next Event is ready, then
+	// the new event will be dropped. Events can be used to wait for state changes,
+	// after which the full state can be retrieved with Read.
+	Events() <-chan Event
+}
+
 type joystickImpl struct {
 	file        *os.File
 	axisCount   int
@@ -146,6 +156,7 @@ func (js *joystickImpl) Events() <-chan Event {
 
 func (js *joystickImpl) Close() {
 	js.file.Close()
+	close(js.events)
 }
 
 type Event struct {
