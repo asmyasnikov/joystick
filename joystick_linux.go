@@ -26,16 +26,6 @@ var (
 	}
 )
 
-// Interface JoystickChannelled provides access to the Joystick opened with the Open() function and make events channel to out
-type JoystickChannelled interface {
-	Joystick
-	// Events receives the events read from the joystick input.
-	// If an Event is not consumed before the next Event is ready, then
-	// the new event will be dropped. Events can be used to wait for state changes,
-	// after which the full state can be retrieved with Read.
-	Events() <-chan Event
-}
-
 type joystickImpl struct {
 	file        *os.File
 	axisCount   int
@@ -55,7 +45,7 @@ type joystickImpl struct {
 //
 // If successful, a Joystick interface is returned which can be used to
 // read the state of the joystick, else an error is returned
-func Open(id int) (Joystick, error) {
+func Open(id int) (JoystickChannelled, error) {
 	f, err := os.OpenFile(fmt.Sprintf("/dev/input/js%d", id), os.O_RDONLY, 0666)
 
 	if err != nil {
@@ -157,13 +147,6 @@ func (js *joystickImpl) Events() <-chan Event {
 func (js *joystickImpl) Close() {
 	js.file.Close()
 	close(js.events)
-}
-
-type Event struct {
-	Time   uint32 /* event timestamp in milliseconds */
-	Value  int16  /* value */
-	Type   uint8  /* event type */
-	Number uint8  /* axis/button number */
 }
 
 func (e *Event) String() string {

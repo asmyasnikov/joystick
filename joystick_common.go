@@ -47,3 +47,21 @@ type Joystick interface {
 	// Close releases this joystick resource
 	Close()
 }
+
+// Event is a raw event from gamepad serial port device
+type Event struct {
+	Time   uint32 /* event timestamp in milliseconds */
+	Value  int16  /* value */
+	Type   uint8  /* event type */
+	Number uint8  /* axis/button number */
+}
+
+// JoystickChannelled Interface provides access to the Joystick opened with the Open() function and make events channel to out
+type JoystickChannelled interface {
+	Joystick
+	// Events receives the events read from the joystick input.
+	// If an Event is not consumed before the next Event is ready, then
+	// the new event will be dropped. Events can be used to wait for state changes,
+	// after which the full state can be retrieved with Read.
+	Events() <-chan Event
+}
